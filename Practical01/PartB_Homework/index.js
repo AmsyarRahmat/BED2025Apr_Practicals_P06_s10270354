@@ -15,11 +15,19 @@ app.get("/name", (req, res) => {
 });
 
 app.get("/hobbies", (req, res) => {
-    res.send("My favourite hobby is to workout at the Gym.");
+    res.json(["coding", "reading", "cycling"]);
 });
 
 app.get("/food", (req, res) => {
     res.send("I love eating chicken.");
+});
+
+app.get("/student", (req, res) => {
+    res.json({
+        "name": "Alex",
+        "hobbies": ["coding", "reading", "cycling"],
+        "intro": "Hi, I'm Alex, a Year 2 student passionate about building APIs!"
+      });
 });
 
 app.listen(PORT, () => {
