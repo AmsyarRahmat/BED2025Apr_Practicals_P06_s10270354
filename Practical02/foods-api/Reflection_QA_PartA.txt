@@ -1,0 +1,10 @@
+Rest APIs commonly use CRUD (Create, Read, Update, Delete)
+HTTP methods to modify data. I understood CRUD by doing Practical 02
+lab in class. I used Postman to perform the HTTP Requests.  
+
+
+Q&A:
+a. Post is used in CRUD to Create, it literally means to POST.
+Put is used in CRUD for Updating the Posted resource.
+
+b. 404.
