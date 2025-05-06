@@ -1,0 +1,2 @@
+app.use(express.json()) is used to parse incoming requests with a
+JSON payload

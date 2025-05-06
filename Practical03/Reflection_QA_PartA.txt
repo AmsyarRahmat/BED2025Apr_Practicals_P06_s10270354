@@ -1,0 +1,2 @@
+It took a while to read and understand the code.
+I faced challenges when implementing this practical.
