@@ -1,0 +1,25 @@
+Task 1
+
+1. To refactor the code into the MVC architecture, I separated the application logic into three folders/layers:
+models folder for database interaction logic
+controllers folder for request handling logic
+middlewares folder for validation middleware
+
+2. I faced no challenges, aside from selecting the right code/data to separate into the MVC architecture
+
+3. This separation of concerns makes applications easier to manage, test, and scale. By isolating the data layer from the presentation layer, 
+MVC ensures that changes in one component do not directly affect the others, promoting cleaner and more maintainable code.
+
+4. Easier to track down issues and understand each part without wading through unrelated code. ^ same as above
+
+5. ^ same as above
+
+
+Task 2
+
+1. It catches bad input early, before reaching the database or logic and gives users clear and consistent feedback on what went wrong
+
+2. Parameterized queries prevent SQL injection attacks by using input validation, which ensures the user is unable to enter harmful
+code into the text box. String Concatenation can be mistaken for code and is a vulnerability.
+
+3. By hiding detailed error information, this prevents/reduces the chances of brute-force attacks.

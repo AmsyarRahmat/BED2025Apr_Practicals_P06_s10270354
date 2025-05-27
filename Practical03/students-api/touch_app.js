@@ -92,19 +92,19 @@ app.get("/students", async (req, res) => {
   // --- POST Route  ---
 
 // POST create new student
-app.post("/studenet", async (req, res) => {
+app.post("/students", async (req, res) => {
     const newStudentData = req.body; // Get new student data from request body
   
     // **WARNING:** No validation is performed here. Invalid data may cause database errors. We will implement the necessary validation in future practicals.
   
     let connection;
     try {
-      connection = await sql.connect(dbConfig); // Get the database connection
+      connection = await sql.connect(dbConfig);
       const sqlQuery = `INSERT INTO Students (name, address) VALUES (@name, @address); SELECT SCOPE_IDENTITY() AS id;`;
       const request = connection.request();
-      // Bind parameters from the request body
-      request.input("title", newStudentData.title);
-      request.input("author", newStudentData.author);
+      // Bind the parameters from the request body
+      request.input("name", newStudentData.name);
+      request.input("address", newStudentData.address);
       const result = await request.query(sqlQuery);
   
       // Attempt to fetch the newly created student to return it
@@ -112,7 +112,7 @@ app.post("/studenet", async (req, res) => {
   
       // Directly fetch the new student here instead of calling a function
       // Re-using the same connection before closing it in finally
-      const getNewStudentQuery = `SELECT student_id, name, address FROM Students WHERE id = @id`;
+      const getNewStudentQuery = `SELECT student_id, name, address FROM Students WHERE student_id = @id`;
       const getNewStudentRequest = connection.request();
       getNewStudentRequest.input("id", newStudentId);
       const newStudentResult = await getNewStudentRequest.query(getNewStudentQuery);
@@ -122,6 +122,90 @@ app.post("/studenet", async (req, res) => {
       console.error("Error in POST /students:", error);
       // Database errors due to invalid data (e.g., missing required fields) will likely be caught here
       res.status(500).send("Error creating student"); // Sends a 500 error on failure
+    } finally {
+      if (connection) {
+        try {
+          await connection.close(); // Close the database connection
+        } catch (closeError) {
+          console.error("Error closing database connection:", closeError);
+        }
+      }
+    }
+  });
+
+  // --- PUT Route ---
+
+  // PUT update student by ID
+  app.put("/students/:id", async (req, res) => {
+    const studentId = parseInt(req.params.id);
+    const updatedStudentData = req.body;
+
+    if (isNaN(studentId)) {
+      return res.status(400).send("Invalid student ID");
+    }
+
+    let connection;
+    try {
+      connection = await sql.connect(dbConfig);
+      const sqlQuery = `UPDATE Students SET name = @name, address = @address WHERE student_id = @id`;
+      const request = connection.request();
+      // Bind the parameters from the request body and URL
+      request.input("id", studentId);
+      request.input("name", updatedStudentData.name);
+      request.input("address", updatedStudentData.address);
+      const result = await request.query(sqlQuery);
+
+      if (result.rowsAffected[0] === 0) {
+        return res.status(404).send("Student not found");
+      }
+
+      // Fetch the updated student to return it
+      const getUpdatedStudentQuery = `SELECT student_id, name, address FROM Students WHERE student_id = @id`;
+      const getUpdatedStudentRequest = connection.request();
+      getUpdatedStudentRequest.input("id", studentId);
+      const updatedStudentResult = await getUpdatedStudentRequest.query(getUpdatedStudentQuery);
+
+      res.json(updatedStudentResult.recordset[0]); // Send the updated student data as JSON
+    } catch (error) {
+      console.error(`Error in PUT /students/${studentId}:`, error);
+      res.status(500).send("Error updating student"); // Sends a 500 error on failure
+    } finally {
+      if (connection) {
+        try {
+          await connection.close(); // Close the database connection
+        } catch (closeError) {
+          console.error("Error closing database connection:", closeError);
+        }
+      }
+    }
+  });
+
+  // --- DELETE Route ---
+
+  // DELETE student by ID
+  app.delete("/students/:id", async (req, res) => {
+    const studentId = parseInt(req.params.id);
+
+    if (isNaN(studentId)) {
+      return res.status(400).send("Invalid student ID");
+    }
+
+    let connection;
+    try {
+      connection = await sql.connect(dbConfig);
+      const sqlQuery = `DELETE FROM Students WHERE student_id = @id`;
+      const request = connection.request();
+      request.input("id", studentId);
+      const result = await request.query(sqlQuery);
+
+      if (result.rowsAffected[0] === 0) {
+        return res.status(404).send("Student not found");
+      }
+
+      res.status(200).send("Student deleted successfully");
+    } catch (error) {
+      console.error(`Error in DELETE /students/${studentId}:`, error);
+      res.status(500).send("Error deleting student"); // Sends a 500 error on failure
     } finally {
       if (connection) {
         try {
